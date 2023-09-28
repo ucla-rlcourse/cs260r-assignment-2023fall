@@ -4,6 +4,12 @@ Hi all! Welcome to our RL course!
 
 This assignment illustrates how to use Jupyter Notebook, the basic of Pytorch and walks you through the assignment submission process!
 
+
+<a target="_blank" href="https://colab.research.google.com/github/ucla-rlcourse/cs260r-assignment-2023fall/blob/main/assignment0/assignment0.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+
 ## Environment setup instruction
 
 In this course, we require you to have the basic knowledge of python.
