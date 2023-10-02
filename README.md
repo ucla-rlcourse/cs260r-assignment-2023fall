@@ -15,7 +15,7 @@ We will respond to you as soon as possible.
 3. Clone or download this repo to get the code at your local computer.
 4. Fill the empty functions, slots and cells we left for you. You can search `TODO` in the files to find them.
 5. Follow the instructions in code comments to check if everything work well.
-6. Follow the submission instruction in the assignments to submit your work in BurinLearn. (If you are formally enrolled.)
+6. Follow the submission instruction in the assignments to submit your work in BruinLearn. (If you are formally enrolled.)
 
 Beautiful code and comment make extra credits. Our aesthetic standard is [PEP 8](https://www.python.org/dev/peps/pep-0008/).
 
