@@ -31,7 +31,7 @@ We recommend you to use anaconda python environments. First, download the packag
 Then create a new conda environment via typing the line in your console:
 
 ```
-conda create -n cs260r python=3.7
+conda create -n cs260r "python>=3.8"
 ```
 
 By doing this, you created an environment named `cs260r ` with python 3.7 installed. 
