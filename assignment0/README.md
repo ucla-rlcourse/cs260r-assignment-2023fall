@@ -31,10 +31,10 @@ We recommend you to use anaconda python environments. First, download the packag
 Then create a new conda environment via typing the line in your console:
 
 ```
-conda create -n cs260r python=3.9
+conda create -n cs260r python=3.11 -y
 ```
 
-By doing this, you created an environment named `cs260r ` with python 3.9 installed. 
+By doing this, you created an environment named `cs260r ` with python 3.11 installed. 
 Then you need to activate your environment before doing anything:
 
 ```
