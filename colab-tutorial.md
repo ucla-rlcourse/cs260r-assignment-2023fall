@@ -44,5 +44,5 @@ Colab has usage limit. Please check colab policy very carefully to avoid your tr
 ------
 
 *CS260R 2023Fall: Reinforcement Learning. Department of Computer Science at University of California, Los Angeles.
-Course Instructor: Professor Bolei ZHOU. Assignment author: Zhenghao PENG, Yiran WANG.*
+Course Instructor: Professor Bolei ZHOU. Assignment author: Zhenghao PENG.*
 
