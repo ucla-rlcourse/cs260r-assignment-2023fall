@@ -156,7 +156,7 @@ class TD3Trainer:
         # Sample replay buffer
         state, action, next_state, reward, not_done = replay_buffer.sample(batch_size)
 
-        # [TODO] Following the TODOs below to implement critic loss
+        # Following the TODOs below to implement critic loss
         with torch.no_grad():
             # TODO: Generate noise and clipped the noise.
             # Hint: Sample a noise from Normal distribution with the scale self.policy_noise.
@@ -165,19 +165,16 @@ class TD3Trainer:
             # ).clamp(-self.noise_clip, self.noise_clip)
             pass
 
-
             # TODO: Select next action according to the delayed-updated policy (self.actor_target) and add noise.
             # next_action = (
             #         ???
             # ).clamp(-self.max_action, self.max_action)
             pass
 
-
             # TODO: Compute the target Q value (the objective of both critics).
             # Hint: Call the delayed-updated critic (self.critic_target) first, then compute the critic objective.
             target_Q = None
             pass
-
 
         # Get current Q estimates
         current_Q1, current_Q2 = self.critic(state, action)
@@ -186,7 +183,6 @@ class TD3Trainer:
         # Hint: Compute the MSE for both critics and add them up.
         critic_loss = None
         pass
-
 
         # Optimize the critic
         self.critic_optimizer.zero_grad()

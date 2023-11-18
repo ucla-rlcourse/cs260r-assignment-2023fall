@@ -41,8 +41,9 @@
 
 10 points
 
+![]()
 
-[TODO]
+[TODO: Replace to your figure]
 
 
 

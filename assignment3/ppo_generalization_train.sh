@@ -7,8 +7,7 @@ for num in 1 5 10 20 50 100; do
   --env-id MetaDrive-Tut-${num}Env-v0 \
   --log-dir MetaDrive-Tut-${num}Env-v0 \
   --num-envs 10 \
-  --max-steps 1000000 \
-  > ppo_metadrive_${num}env_train.log 2>&1 &
+  --max-steps 1_000_000
 done
 
 
