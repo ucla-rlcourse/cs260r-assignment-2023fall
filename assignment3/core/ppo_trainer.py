@@ -17,6 +17,7 @@ import sys
 import gymnasium as gym
 import numpy as np
 import torch
+import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
 
@@ -129,13 +130,11 @@ class PPOTrainer:
             logits, values = self.model(obs)
             pass
 
-
             actions = actions.view(-1, 1)  # In discrete case only return the chosen action.
 
         else:  # Please use normal distribution.
             means, log_std, values = self.model(obs)
             pass
-
 
             actions = actions.view(-1, self.num_actions)
 
@@ -209,7 +208,7 @@ class PPOTrainer:
     def compute_loss(self, sample):
         """Compute the loss of PPO"""
         observations_batch, actions_batch, value_preds_batch, return_batch, masks_batch, \
-            old_action_log_probs_batch, adv_targ = sample
+        old_action_log_probs_batch, adv_targ = sample
 
         assert old_action_log_probs_batch.shape == (self.mini_batch_size, 1)
         assert adv_targ.shape == (self.mini_batch_size, 1)
@@ -230,14 +229,11 @@ class PPOTrainer:
 
         policy_loss_mean = policy_loss.mean()
 
-        # [TODO] Implement value loss
-        # value_loss = None
-        # pass
+        # TODO: Implement value loss
+        value_loss = None
+        pass
 
         value_loss_mean = value_loss.mean()
-
-        # else:
-        # value_loss = 0.5 * (return_batch - values).pow(2).mean()
 
         # This is the total loss
         loss = policy_loss + self.config.value_loss_weight * value_loss - self.config.entropy_loss_weight * dist_entropy
@@ -285,7 +281,7 @@ class PPOTrainer:
                 ratio_epoch.append(ratio.item())
 
         return np.mean(policy_loss_epoch), np.mean(value_loss_epoch), np.mean(dist_entropy_epoch), \
-            np.mean(total_loss_epoch), np.mean(norm_epoch), adv_mean, np.mean(ratio_epoch)
+               np.mean(total_loss_epoch), np.mean(norm_epoch), adv_mean, np.mean(ratio_epoch)
 
 
 if __name__ == '__main__':

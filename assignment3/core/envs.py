@@ -853,12 +853,11 @@ def make_envs(env_id, log_dir="data", num_envs=3, asynchronous=False):
 
     envs = []
     for i in range(num_envs):
-        seed = i
-        def _make(config={}, seed=seed):
+        def _make():
             if "MetaDrive" in env_id:
                 from core.utils import register_metadrive
                 register_metadrive()
-                env = gym.make(env_id, config=config)
+                env = gym.make(env_id)
             else:
                 env = gym.make(env_id)
             return env

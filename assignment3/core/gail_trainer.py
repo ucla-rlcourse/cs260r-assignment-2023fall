@@ -157,7 +157,6 @@ class GAILTrainer(PPOTrainer):
             logits = self.model(obs)
             pass  # TODO
 
-
             actions = actions.view(-1, 1)  # In discrete case only return the chosen action.
 
         else:  # Please use normal distribution.
@@ -221,15 +220,13 @@ class GAILTrainer(PPOTrainer):
         assert dist_entropy.requires_grad
 
         # TODO: Implement policy loss
-        # Hint: Copy the relevant code from ppo_trainer.py
+        # Hint: Copy the relevant code from ppo_trainer.py but treat gail_rewards as the advantage.
+        # No need to implement value network, value loss and advantage as we don't use value estimation for GAIL.
         policy_loss = None
         ratio = None  # The importance sampling factor, the ratio of new policy prob over old policy prob
         pass
 
-
         policy_loss_mean = policy_loss.mean()
-
-        # Note: You can see we do not implement the value loss here.
 
         # This is the total loss
         loss = policy_loss - self.config.entropy_loss_weight * dist_entropy
@@ -264,7 +261,6 @@ class GAILTrainer(PPOTrainer):
                 expert_prediction = None
                 pass
 
-
                 assert agent_prediction.dim() == 1
                 assert expert_prediction.dim() == 1
 
@@ -273,7 +269,6 @@ class GAILTrainer(PPOTrainer):
                 # expert_prediction to be 1. This is the essence of GAIL.
                 discriminator_loss = None
                 pass
-
 
                 # For stats
                 with torch.no_grad():
