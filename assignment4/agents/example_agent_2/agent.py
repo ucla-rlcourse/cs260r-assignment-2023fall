@@ -24,7 +24,7 @@ class Policy:
     def __init__(self):
         config = PPOConfig()
         self.agent = PPOTrainer(config=config)
-        self.agent.load_w(log_dir=FOLDER_ROOT, suffix="iter140")
+        # self.agent.load_w(log_dir=FOLDER_ROOT, suffix="iter140")
 
     def __call__(self, obs):
         value, action, action_log_prob = self.agent.compute_action(obs)

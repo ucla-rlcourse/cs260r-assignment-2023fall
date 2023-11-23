@@ -30,9 +30,9 @@ from core.utils import pretty_print, Timer, step_envs
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--agent-name",
-    required=True,
+    default="example_agent",
     type=str,
-    help="The name of the agent to be evaluated, aka the subfolder name in 'agents/'."
+    help="The name of the agent to be evaluated, aka the subfolder name in 'agents/'. Default: example_agent"
 )
 parser.add_argument(
     "--log-dir",
@@ -150,13 +150,10 @@ if __name__ == '__main__':
 
     # Instantiate all policies here.
     all_policies = load_policies()
-    policy_map = {}
-    for key, Policy in all_policies.items():
-        policy_map[key] = Policy()
 
     # We will use the specified agent.
     agent_name = args.agent_name
-    policy = policy_map[agent_name]
+    policy = all_policies[agent_name]()
 
     print("==================================================")
     print(f"EVALUATING AGENT {agent_name} (CREATOR: {policy.CREATOR_NAME}, UID: {policy.CREATOR_UID})")

@@ -176,3 +176,9 @@ We provide the training script to train a PPO agent in single-agent environment.
 We provide an example agent in `agents/`. Unfortunately, I can not provide my trained checkpoint there and I commented out the line to restore checkpoint.
 
 We also provide two evaluation scripts. You can check out `eval_multi_agent_performance.py` and `eval_single_agent_performance.sh`.
+
+Notes:
+
+* You can set `--num-processes=1` to avoid using multiprocessing. This helps debugging.
+* You can load pretrained model in training via flag `--pretrained-model-log-dir` and `--pretrained-model-suffix`.
+* You can set the opponent agent when training in multi-agent env via `--opponent-agent-name`.
