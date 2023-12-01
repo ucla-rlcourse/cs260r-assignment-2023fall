@@ -175,6 +175,9 @@ if __name__ == '__main__':
     print("Start evaluation!")
     obs = envs.reset()
 
+    if hasattr(policy, "reset"):
+        policy.reset()
+
     with tqdm.tqdm(total=int(total_episodes_to_eval)) as pbar:
         while True:
 
@@ -191,6 +194,9 @@ if __name__ == '__main__':
                 total_episodes=total_episodes,
                 device=config.device
             )
+
+            if hasattr(policy, "reset"):
+                policy.reset(done_batch=done)
 
             if render:
                 envs.render(mode="topdown")

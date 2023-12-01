@@ -125,6 +125,9 @@ if __name__ == '__main__':
     for policy_name, Policy in all_policies.items():
         if policy_name in POLICY_MAP:
             control_agent_name = POLICY_MAP[policy_name]
+            policy = Policy()
+            if hasattr(policy, "reset"):
+                policy.reset()
             policy_map[control_agent_name] = Policy()
 
     print("==================================================")
@@ -208,6 +211,10 @@ if __name__ == '__main__':
                     total_episodes += 1
                     obs_dict, _ = env.reset()
                     terminated_dict = {}
+
+                    for policy in policy_map.values():
+                        if hasattr(policy, "reset"):
+                            policy.reset()
 
                 pbar.update(total_episodes - pbar.n)
                 if total_episodes >= total_episodes_to_eval:
