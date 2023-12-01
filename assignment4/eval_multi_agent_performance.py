@@ -201,10 +201,10 @@ if __name__ == '__main__':
         if a0_succ and a1_succ:
             a0_len = result_recorder["agent0"]["episode_length"][episode_count]
             a1_len = result_recorder["agent1"]["episode_length"][episode_count]
-            if a0_len > a1_len:
+            if a0_len < a1_len:
                 win_stat["agent0"] += 1
                 score_stat["agent0"] += 1
-            elif a0_len < a1_len:
+            elif a0_len > a1_len:
                 win_stat["agent1"] += 1
                 score_stat["agent1"] += 1
             else:  # If both arrive destination at the same time: higher speed agent wins.
