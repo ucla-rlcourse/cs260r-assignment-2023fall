@@ -44,6 +44,11 @@ parser.add_argument(
     action="store_true",
     help="Whether to launch both the top-down renderer and the 3D renderer. Default: False."
 )
+parser.add_argument(
+    "--generate-video",
+    action="store_true",
+    help="Whether to generate videos when rendering."
+)
 args = parser.parse_args()
 
 
@@ -74,6 +79,8 @@ class MultiAgentRacingEnvWithSimplifiedReward(MultiAgentRacingEnv):
 if __name__ == '__main__':
     # Verify algorithm and config
 
+    generate_video = args.generate_video
+
     config = PPOConfig()
 
     config.num_processes = args.num_processes
@@ -86,11 +93,28 @@ if __name__ == '__main__':
     torch.set_num_threads(1)
 
     render = args.render
+    video_bev = []
+    video_interface = []
 
     # Create environment. Here we don't use the vectorized environment wrapper.
     env = MultiAgentRacingEnvWithSimplifiedReward(dict(
+
+        # We only evaluate 2 agents now.
         num_agents=2,
-        use_render=render,
+
+        # If you want to extend the number of agents to 12, you need to fill the policies for agent2, ..., agent11 and
+        # use these configs:
+        # num_agents=12,
+        # map_config=dict(lane_num=2, exit_length=60),  # Increasing the space in spawning the agents.
+
+        # If you are using Mac or headless machine and want to render the top-down view only, comment out next line.
+        use_render=render or generate_video,
+
+        # This config sets the color of agent0 to green.
+        target_vehicle_configs=dict(
+            agent0=dict(use_special_color=True)
+        )
+
     ))
 
     total_episodes_to_eval = args.num_episodes
@@ -110,61 +134,87 @@ if __name__ == '__main__':
     # Setup some stats helpers
     total_episodes = total_steps = iteration = 0
     last_total_steps = 0
+    count = 0
 
     result_recorder = defaultdict(lambda: defaultdict(list))  # A nested dict
 
     print("Start evaluation!")
-    obs_dict, _ = env.reset()
-    terminated_dict = {}
-    with tqdm.tqdm(total=int(total_episodes_to_eval)) as pbar:
-        while True:
+    try:
+        obs_dict, _ = env.reset()
+        terminated_dict = {}
+        with tqdm.tqdm(total=int(total_episodes_to_eval)) as pbar:
+            while True:
 
-            # Form the action dict
-            action_dict = {}
-            for agent_name, agent_obs in obs_dict.items():
-                if agent_name in terminated_dict and terminated_dict[agent_name]:
-                    continue
-                act = policy_map[agent_name](agent_obs)
-                if act.ndim == 2:
-                    act = np.squeeze(act, axis=0)
-                action_dict[agent_name] = act
+                # Form the action dict
+                action_dict = {}
+                for agent_name, agent_obs in obs_dict.items():
+                    if agent_name in terminated_dict and terminated_dict[agent_name]:
+                        continue
+                    act = policy_map[agent_name](agent_obs)
+                    if act.ndim == 2:
+                        act = np.squeeze(act, axis=0)
+                    action_dict[agent_name] = act
 
-            # Step the environment
-            obs_dict, reward_dict, terminated_dict, truncated_dict, info_dict = env.step(action_dict)
+                # Step the environment
+                obs_dict, reward_dict, terminated_dict, truncated_dict, info_dict = env.step(action_dict)
 
-            if render:
-                env.render(mode="topdown")
+                count += 1
 
-            for agent_name, agent_done in terminated_dict.items():
-                if agent_name == "__all__":
-                    continue
-                agent_info = info_dict[agent_name]
-                if "crash_vehicle" in agent_info:
-                    result_recorder[agent_name]["crash_vehicle_rate"].append(agent_info["crash_vehicle"])
-                if "crash_sidewalk" in agent_info:
-                    result_recorder[agent_name]["crash_sidewalk_rate"].append(agent_info["crash_sidewalk"])
-                if "idle" in agent_info:
-                    result_recorder[agent_name]["idle_rate"].append(agent_info["idle"])
-                if "speed_km_h" in agent_info:
-                    result_recorder[agent_name]["speed_km_h"].append(agent_info["speed_km_h"])
-                if agent_done:  # the episode is done
-                    # Record the reward of the terminated episode to
-                    result_recorder[agent_name]["episode_reward"].append(agent_info["episode_reward"])
-                    if "arrive_dest" in agent_info:
-                        result_recorder[agent_name]["success_rate"].append(agent_info["arrive_dest"])
-                    if "max_step" in agent_info:
-                        result_recorder[agent_name]["max_step_rate"].append(agent_info["max_step"])
-                    if "episode_length" in agent_info:
-                        result_recorder[agent_name]["episode_length"].append(agent_info["episode_length"])
+                if render and not generate_video:
+                    env.render(mode="topdown")
 
-            if terminated_dict["__all__"]:
-                total_episodes += 1
-                obs_dict, _ = env.reset()
-                terminated_dict = {}
+                if generate_video:
+                    import pygame
 
-            pbar.update(total_episodes - pbar.n)
-            if total_episodes >= total_episodes_to_eval:
-                break
+                    img_interface = env.render(mode="rgb_array")
+                    img_bev = env.render(
+                        mode="topdown",
+                        # show_agent_name=True,
+                        # target_vehicle_heading_up=True,
+                        draw_target_vehicle_trajectory=False,
+                        film_size=(5000, 5000),
+                        screen_size=(1000, 1000),
+                        crash_vehicle_done=False,
+                    )
+                    img_bev = pygame.surfarray.array3d(img_bev)
+                    img_bev = img_bev.swapaxes(0, 1)
+                    # img_bev = img_bev[::-1]
+                    video_bev.append(img_bev)
+                    video_interface.append(img_interface)
+
+                for agent_name, agent_done in terminated_dict.items():
+                    if agent_name == "__all__":
+                        continue
+                    agent_info = info_dict[agent_name]
+                    if "crash_vehicle" in agent_info:
+                        result_recorder[agent_name]["crash_vehicle_rate"].append(agent_info["crash_vehicle"])
+                    if "crash_sidewalk" in agent_info:
+                        result_recorder[agent_name]["crash_sidewalk_rate"].append(agent_info["crash_sidewalk"])
+                    if "idle" in agent_info:
+                        result_recorder[agent_name]["idle_rate"].append(agent_info["idle"])
+                    if "speed_km_h" in agent_info:
+                        result_recorder[agent_name]["speed_km_h"].append(agent_info["speed_km_h"])
+                    if agent_done:  # the episode is done
+                        # Record the reward of the terminated episode to
+                        result_recorder[agent_name]["episode_reward"].append(agent_info["episode_reward"])
+                        if "arrive_dest" in agent_info:
+                            result_recorder[agent_name]["success_rate"].append(agent_info["arrive_dest"])
+                        if "max_step" in agent_info:
+                            result_recorder[agent_name]["max_step_rate"].append(agent_info["max_step"])
+                        if "episode_length" in agent_info:
+                            result_recorder[agent_name]["episode_length"].append(agent_info["episode_length"])
+
+                if terminated_dict["__all__"]:
+                    total_episodes += 1
+                    obs_dict, _ = env.reset()
+                    terminated_dict = {}
+
+                pbar.update(total_episodes - pbar.n)
+                if total_episodes >= total_episodes_to_eval:
+                    break
+    finally:
+        env.close()
+
 
     print("==================================================")
     print("AVERAGE PERFORMANCE")
@@ -248,4 +298,22 @@ if __name__ == '__main__':
             f"Agent1 {inverse_policy_map['agent1']} (CREATOR: {policy_map['agent1'].CREATOR_NAME}, UID: {policy_map['agent1'].CREATOR_UID}) Wins!")
     print("==================================================")
 
-    env.close()
+
+    if generate_video:
+        import datetime
+        import os
+        import mediapy
+
+        FPS = 60
+
+        folder_name = "marl_racing_video_{}".format(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+        os.makedirs(folder_name, exist_ok=True)
+
+        video_base_name = f"{folder_name}/video"
+        video_name_bev = video_base_name + "_bev.mp4"
+        print("BEV video should be saved at: ", video_name_bev)
+        mediapy.write_video(video_name_bev, video_bev, fps=FPS)
+
+        video_name_interface = video_base_name + "_interface.mp4"
+        print("Interface video should be saved at: ", video_name_interface)
+        mediapy.write_video(video_name_interface, video_interface, fps=FPS)

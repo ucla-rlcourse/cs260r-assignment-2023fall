@@ -26,13 +26,28 @@ from core.ppo_trainer import PPOTrainer, PPOConfig
 from core.utils import verify_log_dir, pretty_print, Timer, step_envs
 
 environment_config = dict(
+
+    # We only run 2 agents now.
     num_agents=2,  # <<< Use 2 agents where agent0 is controlled by the learning RL agent.
+
+    # Reward setting
     crash_sidewalk_penalty=50,
     success_reward=100,
     speed_reward=0,
     crash_vehicle_penalty=0,  # Default is 10. Set to -10 so env will reward agent +10 for crashing.
 
     # use_render=True,  # For debug, set num_processes=1
+
+    # If you want to extend the number of agents to 12, you need to fill the policies for agent2, ..., agent11 and
+    # use these configs:
+    # num_agents=12,
+    # map_config=dict(lane_num=2, exit_length=60),  # Increasing the space in spawning the agents.
+
+    # This config sets the color of agent0 to green.
+    target_vehicle_configs=dict(
+        agent0=dict(use_special_color=True)
+    )
+
 )
 
 parser = argparse.ArgumentParser()
