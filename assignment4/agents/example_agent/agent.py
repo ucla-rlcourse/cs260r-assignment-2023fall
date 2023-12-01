@@ -26,6 +26,20 @@ class Policy:
         self.agent = PPOTrainer(config=config)
         # self.agent.load_w(log_dir=FOLDER_ROOT, suffix="iter275")
 
+    def reset(self, done_batch=None):
+        """
+        Optionally reset the latent state of your agent, if any.
+
+        Args:
+            done_batch: an array with shape (batch_size,) in vectorized environment or a boolean in single environment.
+            True represents the latent state of this episode should be reset.
+            If it's None, you should reset the latent state for all episodes.
+
+        Returns:
+            None
+        """
+        pass
+
     def __call__(self, obs):
         value, action, action_log_prob = self.agent.compute_action(obs)
         action = action.detach().cpu().numpy()
