@@ -114,6 +114,10 @@ if __name__ == "__main__":
             action = env.action_space.sample()
         else:
             # TODO: Uncomment these lines and learn how TD3 generates exploratory actions.
+            # action = (
+            #         policy.select_action(np.array(state))
+            #         + np.random.normal(0, max_action * args.explore_noise, size=action_dim)
+            # ).clip(-max_action, max_action)
             pass
 
         # Perform action
