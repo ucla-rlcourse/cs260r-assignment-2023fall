@@ -1,5 +1,5 @@
 
-# Assignment 3: Reinforcement Learning Pipeline in Practice
+# Assignment 4
 
 
 *CS260R 2023Fall: Reinforcement Learning. Department of Computer Science at University of California, Los Angeles.
